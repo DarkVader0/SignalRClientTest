@@ -1,0 +1,37 @@
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.js"></script>
+</head>
+
+<script>
+const connection = new signalR.HubConnectionBuilder()
+    .withUrl("https://localhost:7052/hub",{
+        skipNegotiation: true,
+        transport: signalR.HttpTransportType.WebSockets
+    })
+    .configureLogging(signalR.LogLevel.Information)
+    .build();
+
+    var start = async () => {
+        try {
+            await connection.start();
+            console.log("SignalR Connected.");
+        } catch (err) {
+            console.log(err);
+            setTimeout(start, 5000);
+        }
+    };
+
+    connection.invoke('func name', {object: "object"})
+
+    connection.on('func name', (params) => {
+        console.log(JSON.stringify(params))
+    })
+
+    connection.onclose(async () => {
+        await start();
+    });
+
+    // Start the connection.
+start();
+
+</script>
